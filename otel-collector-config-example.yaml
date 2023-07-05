@@ -1,0 +1,35 @@
+receivers: # how data gets into the Collector
+  # Data sources: traces, metrics, logs
+  otlp:
+    protocols:
+      grpc:
+      http:
+        cors:
+          allowed_origins: ["*"]
+          allowed_headers: ["*"]
+          
+exporters: # how you send data to one or more backends/destinations
+  otlp:
+    endpoint: "10.10.70.185:4317"
+    tls:
+      insecure: true
+  logging:
+  jaeger:
+    endpoint: jaeger-all-in-one:14250
+    tls:
+      insecure: true
+
+processors: # run on data between being received and being exported
+  # Data sources: traces, metrics, logs
+  batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp, logging]
+      processors: [batch]
+    metrics:
+      receivers: [otlp]
+      exporters: [otlp, logging]
+      processors: [batch]
